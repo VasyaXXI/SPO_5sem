@@ -1,5 +1,6 @@
 package ru.Kirilov.biboran;
 
+import ru.Kirilov.biboran.exception.LangParseException;
 import ru.Kirilov.biboran.lexer.Lexer;
 import ru.Kirilov.biboran.token.Token;
 import ru.Kirilov.biboran.parser.Parser;
@@ -11,7 +12,7 @@ import java.util.Scanner;
 
 public class BiboranUI {
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException, LangParseException {
         // write your code here
         File file = new File("src/bibus.txt");
         Scanner inp = new Scanner(file);
