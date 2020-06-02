@@ -2,6 +2,7 @@ package ru.Kirilov.biboran;
 
 import ru.Kirilov.biboran.lexer.Lexer;
 import ru.Kirilov.biboran.token.Token;
+import ru.Kirilov.biboran.parser.Parser;
 
 import java.util.List;
 import java.io.File;
@@ -23,5 +24,8 @@ public class BiboranUI {
 
         for (Token token: tokens)
             System.out.println(token);
+
+        Parser parser = new Parser(tokens);
+        parser.lang();
     }
 }

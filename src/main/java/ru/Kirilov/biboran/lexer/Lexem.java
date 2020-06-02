@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 
 public enum Lexem {
 
-    VAR("^[a-zA-z]\\s*$", 0),
+    VAR("^[a-zA-z]*+\\s*$", 0),
     DIGIT("^(0|([1-9][0-9]*))\\s*$", 0),
     ASSIGN_OP("^=\\s*$", 0),
     LOGIC_OP("^(>|<|==|>=|<=)\\s*$", 2),
@@ -18,9 +18,9 @@ public enum Lexem {
 
     SEMICOLON("^;\\s*$", 10),
 
-    IF_KW("^if\\s*$", 5),
-    WHILE_KW("^while\\s*$", 5),
-    FOW_KW("^for\\s*$", 5);
+    IF_KW("^esli\\s*$", 5),
+    WHILE_KW("^poka\\s*$", 5),
+    FOW_KW("^dlya\\s*$", 5);
 
     private final Pattern pattern;
     private int priority;

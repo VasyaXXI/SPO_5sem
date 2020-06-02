@@ -1,6 +1,6 @@
 c = 5
 a = 3
 b = a + c
-if( a > b ){
+esli( a > b ){
 b = 5
 }
