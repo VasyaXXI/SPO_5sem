@@ -1,6 +1,3 @@
-c = 5
-a = 3
-b = a + c
-esli( a > b ){
-b = 5
+esli(a > b){
+b = a;
 }

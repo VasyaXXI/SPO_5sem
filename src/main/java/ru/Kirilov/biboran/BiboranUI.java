@@ -1,6 +1,7 @@
 package ru.Kirilov.biboran;
 
 import ru.Kirilov.biboran.exception.LangParseException;
+import ru.Kirilov.biboran.exception.EofException;
 import ru.Kirilov.biboran.lexer.Lexer;
 import ru.Kirilov.biboran.token.Token;
 import ru.Kirilov.biboran.parser.Parser;
@@ -27,6 +28,10 @@ public class BiboranUI {
             System.out.println(token);
 
         Parser parser = new Parser(tokens);
-        parser.lang();
+        try {
+            parser.lang();
+        } catch (EofException e){
+
+        }
     }
 }
