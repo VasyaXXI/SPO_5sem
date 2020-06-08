@@ -7,136 +7,184 @@ import ru.Kirilov.biboran.token.Token;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Stack;
 
 public class Parser {
 
     private ListIterator<Token> iterator;
 
-    private int depth;
+    private Stack<Integer> depth;
 
     private final List<Token> tokens;
 
     public Parser(List<Token> tokens) {
         this.tokens = tokens;
-        this.depth = 0;
+        this.depth = new Stack<>();
         this.iterator = tokens.listIterator();
     }
-    //=============================================================================================================
+
     public void lang() throws LangParseException, EofException {
         while(true) {
             expr();
         }
     }
-    //-----------------------------------------------------------------(ветви)
+    //
     private void expr() throws LangParseException, EofException {
+        depth.push(0);
         try {
             assignExpr();
         } catch (LangParseException e){
             try{
-                back(depth);
-                depth = 0;
-                log_circle();
-            } catch (LangParseException ex){
-                throw new LangParseException(
-                        e.getMessage() + " / "
-                                + ex.getMessage()
-                );
+                back(depth.pop());
+                depth.push(0);
+                if_cycle();
+            } catch (LangParseException e2){
+                try {
+                    back(depth.pop());
+                    depth.push(0);
+                    while_cycle();
+                } catch (LangParseException e3) {
+                    throw new LangParseException(
+                            e.getMessage() + " / "
+                                    + e2.getMessage() + " / "
+                                    + e3.getMessage()
+                    );
+
+                }
             }
         }
+        depth.pop();
     }
-    //-----------------------------------------------------------------
+    //
     private void assignExpr() throws LangParseException, EofException {
         var();
         assignOp();
         value();
+        math_op();
+        value();
         semicolon();
     }
-    //-----------------------------------------------------------------(значения)
+    //
+//    private void mathExpr() throws LangParseException, EofException {
+//        assignE();
+//        math_op();
+//        value();
+//        semicolon();
+//    }
+//    private void assignE() throws LangParseException, EofException{
+//        var();
+//        assignOp();
+//        value();
+//    }
+    //
+//    private void assignHardExpr() throws LangParseException, EofException {
+//        var();
+//        assignOp();
+//        value();
+//        math_op();
+//        value();
+//        semicolon();
+//    }
+    //
     private void value() throws LangParseException, EofException {
+        depth.push(0);
         try{
             var();
         } catch (LangParseException e) {
             try {
-                back(depth);
-                depth = 0;
+                back(depth.pop());
+                depth.push(0);
                 digit();
-            } catch (LangParseException ex){
+            } catch (LangParseException e2){
                 throw new LangParseException(
                         e.getMessage() + " / "
-                                + ex.getMessage()
+                                + e2.getMessage()
                 );
             }
         }
+        depth.pop();
     }
-    //-----------------------------------------------------------------(буквы)
     private void var() throws LangParseException, EofException {
         match(getCurrentToken(), Lexem.VAR);
     }
-    //-----------------------------------------------------------------(равно)
     private void assignOp() throws LangParseException, EofException {
         match(getCurrentToken(), Lexem.ASSIGN_OP);
     }
-    //-----------------------------------------------------------------(числа)
     private void digit() throws LangParseException, EofException {
         match(getCurrentToken(), Lexem.DIGIT);
     }
-    //----------------------------------------------------------------(ветка циклов)
-    private void log_circle() throws LangParseException, EofException {
+    private void if_cycle() throws LangParseException, EofException {
         if_log();
         log_body();
     }
-    //-----------------------------------------------------------------(if - до close if)
+
+    private void while_cycle() throws LangParseException, EofException {
+        while_log();
+        log_body();
+    }
+
     private void if_log() throws LangParseException, EofException {
         if_kw();
-        log_bracket();
+        condition();
     }
-    //-----------------------------------------------------------------
+
+    private void while_log() throws LangParseException, EofException {
+        while_kw();
+        condition();
+    }
+
     private void if_kw() throws LangParseException, EofException {
-        match(getCurrentToken(), Lexem.IF_KW);
+        match(getCurrentToken(), Lexem.IF_CON);
     }
-    //-----------------------------------------------------------------
-    private void log_bracket() throws LangParseException, EofException {
+
+    private void while_kw() throws LangParseException, EofException {
+        match(getCurrentToken(), Lexem.WHILE_CON);
+    }
+
+    private void condition() throws LangParseException, EofException {
         open_bracket();
-        log_expression();
+        logic_comparison();
         close_bracket();
     }
-    //-----------------------------------------------------------------
     private void open_bracket() throws LangParseException, EofException {
         match(getCurrentToken(), Lexem.OPEN_BRACKET);
     }
-    //-----------------------------------------------------------------
-    private void log_expression() throws LangParseException, EofException {
+    private void logic_comparison() throws LangParseException, EofException {
         value();
-        log_op();
+        logic_op();
         value();
     }
-    //-----------------------------------------------------------------
-    private void log_op() throws LangParseException, EofException {
+    //
+    private void math_op() throws LangParseException, EofException {
+        match(getCurrentToken(), Lexem.MATH_OP);
+    }
+    //
+    private void logic_op() throws LangParseException, EofException {
         match(getCurrentToken(), Lexem.LOGIC_OP);
     }
-    //-----------------------------------------------------------------
+    //
     private void close_bracket() throws LangParseException, EofException {
         match(getCurrentToken(), Lexem.CLOSE_BRACKET);
     }
-    //-----------------------------------------------------------------(close if)
+    //
     private void log_body() throws LangParseException, EofException {
         open_brace();
         expr();
         close_brace();
     }
-    //-----------------------------------------------------------------
+    //
     private void open_brace() throws LangParseException, EofException {
         match(getCurrentToken(), Lexem.OPEN_BRACE);
     }
-    //-----------------------------------------------------------------
+    //
     private void close_brace() throws LangParseException, EofException {
         match(getCurrentToken(), Lexem.CLOSE_BRACE);
     }
-    //-----------------------------------------------------------------
+    //
     private void semicolon() throws LangParseException, EofException {
         match(getCurrentToken(), Lexem.SEMICOLON);
     }
-    //=============================================================================================================
+
     private void match(Token token, Lexem lexem) throws LangParseException {
         if (!token.getLexem().equals(lexem)) {
             throw new LangParseException( lexem.name() + " expected " +
@@ -155,7 +203,7 @@ public class Parser {
     private Token getCurrentToken() throws EofException {
         if (iterator.hasNext()) {
             Token token = iterator.next();
-            depth++;
+            depth.push(depth.pop() + 1);
             return token;
         }
         throw new EofException("EOF");
