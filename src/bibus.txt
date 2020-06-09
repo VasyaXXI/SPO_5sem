@@ -1,7 +1,15 @@
-poka(a > b){
-b = b + 5;
+a = 5
+b = 2
+poka b < a {
+b = b + 1
 }
-esli(b > a){
-b = b + 2;
+c = 5 * 8 + ( 7 - 6 + (((((1*2))))) - 3) - 30
+esli c > a {
+a = a * 3
 }
-a = a + b;
+list abdul
+abdul add 5
+abdul add c
+abdul add a
+abdul remove 5
+abdul add 228

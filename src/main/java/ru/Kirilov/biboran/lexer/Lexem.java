@@ -3,43 +3,40 @@ package ru.Kirilov.biboran.lexer;
 import java.util.regex.Pattern;
 
 public enum Lexem {
+    VAR("^[a-zA-Z][a-zA-Z0-9]*+\\s*$"),
 
-    VAR("^[a-zA-Z]*+\\s*$", 0),
+    DIGIT("^(0|([1-9][0-9]*))\\s*$"),
 
-    DIGIT("^(0|([1-9][0-9]*))\\s*$", 0),
+    ASSIGN_OP("^=\\s*$"),
 
-    ASSIGN_OP("^=\\s*$", 0),
+    MATH_OP("^(\\+|-|\\*|/)\\s*$"),
+    LOGIC_OP("^(>|>=|==|<=|<)\\s*$"),
 
-    LOGIC_OP("^(>|<|==|>=|<=)\\s*$", 2),
+    IF_CON("^esli\\s*$"),
+    WHILE_CON("^poka +\\s*$"),
 
-    MATH_OP("^(\\+|-|\\*|/)\\s*$", 3),
+    OPEN_BRAC("^(\\()\\s*$"),
+    CLOSE_BRAC("^(\\))\\s*$"),
 
-    OPEN_BRACKET("^\\(\\s*$", 1),
-    CLOSE_BRACKET("^\\)\\s*$", 1),
+    OPEN_BRACE("^(\\{)\\s*$"),
+    CLOSE_BRACE("^(\\})\\s*$"),
 
-    OPEN_BRACE("^\\{\\s*$", -1),
-    CLOSE_BRACE("^\\}\\s*$", 1),
+    TYPE("^list\\s*$"),
+    FUN_OP("^(add|remove|get|)\\s*$"),
 
-    IF_CON("^esli\\s*$", 5),
-    WHILE_CON("^poka\\s*$", 5),
+    BOOL("true|false"),
 
-    SEMICOLON("^;\\s*$", 10);
-
-
+    END_LINE("^\n$"),
+    MARK("^$"),
+    MARK_INDEX("^$");
 
     private final Pattern pattern;
-    private int priority;
 
-    Lexem(String regexp, int priority) {
+    Lexem(String regexp) {
         this.pattern = Pattern.compile(regexp);
-        this.priority = priority;
     }
 
     public Pattern getPattern() {
         return pattern;
-    }
-
-    public int getPriority() {
-        return priority;
     }
 }
